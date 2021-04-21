@@ -10,7 +10,7 @@
 using namespace std;
 /* Private defines -----------------------------------------------------------*/
 #define MAX_OUTPUT_DATA                         (1000)
-#define MAX_GENERATED_NUM_OF_VALUES             (50000)
+#define MAX_GENERATED_NUM_OF_VALUES             (20000)
 /* Private variables ---------------------------------------------------------*/
 int made[MAX_GENERATED_NUM_OF_VALUES]; //storage to work with random values
 int arr[MAX_GENERATED_NUM_OF_VALUES]; //storage for start random values
@@ -53,12 +53,13 @@ void prepare_for_sort(uint32_t NUM) //copy random massive to sort it
 
 void writeFile(DWORD *delta, string section) //function used to create txt file
 {
+    FILE *fp;
     const string s = section + ".txt";
 	cout << s.c_str() << endl;
-    freopen(s.c_str(), "w", stdout);
-	for (int i = 0; i < 100; i++)
+    fp=freopen(s.c_str(), "w", stdout);
+	for (int i = 0; i < MAX_OUTPUT_DATA; i++)
     	printf("%d\n", delta[i]);
-    fclose(stdout);
+    fclose(fp);
 }
 
 void start_sort_experiment(DWORD *input_delta, void (*fun_ptr)(int* l, int* r), string filename)
@@ -78,8 +79,15 @@ void start_sort_experiment(DWORD *input_delta, void (*fun_ptr)(int* l, int* r), 
 
 int main(void)
 {
+	string section_bubble="bubblesort";
+	string section_comb="combsort";
+	string section_insert="insertionsort";
+	string section_tree="treesort";
+	string section_gnome="gnomesort";
+	string section_shaker="shakersort";
+	string section_selection="selectionsort";
     random_generator(MAX_GENERATED_NUM_OF_VALUES);
-    start_sort_experiment(bubblesort_delta,bubblesort,"bubblesort");
+    start_sort_experiment(bubblesort_delta,bubblesort,section_bubble);
     start_sort_experiment(combsort_delta,combsort,"combsort");
     start_sort_experiment(insertionsort_delta,insertionsort,"insertionsort");
     start_sort_experiment(treesort_delta,treesort,"treesort");
