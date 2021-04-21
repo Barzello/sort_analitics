@@ -1,5 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <cstdio>
+#include <algorithm>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -7,19 +8,20 @@
 #include "sysinfoapi.h"
 #include "sort_list.hpp"
 using namespace std;
+/* Private defines -----------------------------------------------------------*/
+#define MAX_OUTPUT_DATA                         (1000)
+#define MAX_GENERATED_VALUES                    (1000000)
 /* Private variables ---------------------------------------------------------*/
-const int N = 1000000;
-int made[N];
-int arr[N];
-int curt = 1;
+int made[MAX_GENERATED_VALUES];
+int arr[MAX_GENERATED_VALUES];
 
-DWORD bubblesort_delta[100]={0,};
-DWORD combsort_delta[100]={0,};
-DWORD insertionsort_delta[100]={0,};
-DWORD treesort_delta[100]={0,};
-DWORD gnomesort_delta[100]={0,};
-DWORD shakersort_delta[100]={0,};
-DWORD selectionsort_delta[100]={0,};
+DWORD bubblesort_delta[MAX_OUTPUT_DATA]={0,};
+DWORD combsort_delta[MAX_OUTPUT_DATA]={0,};
+DWORD insertionsort_delta[MAX_OUTPUT_DATA]={0,};
+DWORD treesort_delta[MAX_OUTPUT_DATA]={0,};
+DWORD gnomesort_delta[MAX_OUTPUT_DATA]={0,};
+DWORD shakersort_delta[MAX_OUTPUT_DATA]={0,};
+DWORD selectionsort_delta[MAX_OUTPUT_DATA]={0,};
 /* Private function prototypes -----------------------------------------------*/
 
 
@@ -32,18 +34,18 @@ int randint() //function to generate random values
 }
 
 
-void random_generator(int NUM) //function to generate and fill mass of random values
+void random_generator(uint32_t NUM) //function to generate and fill mass of random values
 {   
-	for (int j = 0; j < NUM; j++)
+	for (uint32_t j = 0; j < NUM; j++)
 	{
 		arr[j] = randint() % (int)10;  //work with global values
 	}
 		         
 }
 
-void prepare_for_sort(int NUM) //copy random massive to sort it
+void prepare_for_sort(uint32_t NUM) //copy random massive to sort it
 {
-	for (int j = 0; j < NUM; j++)
+	for (uint32_t j = 0; j < NUM; j++)
 	{
 		made[j]=arr[j]; //work with global values
 	}
@@ -52,22 +54,23 @@ void prepare_for_sort(int NUM) //copy random massive to sort it
 
 void writeFile(DWORD *delta, string section) //function used to create txt file
 {
-    const string s = section + to_string(curt) + ".txt";
+    const string s = section + ".txt";
 	cout << s.c_str() << endl;
     freopen(s.c_str(), "w", stdout);
 	for (int i = 0; i < 100; i++)
     	printf("%d\n", delta[i]);
     fclose(stdout);
-    curt++;
 }
 
-void start_sort_experiment(DWORD *input_delta, void (*fun_ptr)(void), string filename)
+void start_sort_experiment(DWORD *input_delta, void (*fun_ptr)(int* l, int* r), string filename)
 {
-	for(uint8_t i=0;i<100;i++)
+	for(uint32_t i=0;i<MAX_OUTPUT_DATA;i++)
 	{
-		prepare_for_sort(i);
+        if((i*100)>MAX_GENERATED_VALUES) break;
+		prepare_for_sort(i*100);
+        printf("%ld\n",i*100);
 		DWORD t1 = GetTickCount();
-		fun_ptr();
+		fun_ptr(made,made+i*100);
 		DWORD t2 = GetTickCount();
 		input_delta[i]=t2-t1;
 	}
@@ -84,5 +87,7 @@ int main(void)
 	string section_shaker="shakersort";
 	string section_selection="selectionsort";
 
+    random_generator(MAX_GENERATED_VALUES);
+    start_sort_experiment(bubblesort_delta,bubblesort,section_bubble);
     return 0;
 }

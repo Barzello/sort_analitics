@@ -3,6 +3,7 @@
 #include <iostream>
 #include <stack>
 #include <set>
+#include "sort_list.hpp"
 using namespace std;
 
 //bubble sort
