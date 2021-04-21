@@ -10,10 +10,10 @@
 using namespace std;
 /* Private defines -----------------------------------------------------------*/
 #define MAX_OUTPUT_DATA                         (1000)
-#define MAX_GENERATED_VALUES                    (1000000)
+#define MAX_GENERATED_NUM_OF_VALUES             (50000)
 /* Private variables ---------------------------------------------------------*/
-int made[MAX_GENERATED_VALUES];
-int arr[MAX_GENERATED_VALUES];
+int made[MAX_GENERATED_NUM_OF_VALUES]; //storage to work with random values
+int arr[MAX_GENERATED_NUM_OF_VALUES]; //storage for start random values
 
 DWORD bubblesort_delta[MAX_OUTPUT_DATA]={0,};
 DWORD combsort_delta[MAX_OUTPUT_DATA]={0,};
@@ -32,7 +32,6 @@ int randint() //function to generate random values
 {
     return rand() * RAND_MAX + rand();
 }
-
 
 void random_generator(uint32_t NUM) //function to generate and fill mass of random values
 {   
@@ -66,7 +65,7 @@ void start_sort_experiment(DWORD *input_delta, void (*fun_ptr)(int* l, int* r), 
 {
 	for(uint32_t i=0;i<MAX_OUTPUT_DATA;i++)
 	{
-        if((i*100)>MAX_GENERATED_VALUES) break;
+        if((i*100)>MAX_GENERATED_NUM_OF_VALUES) break;
 		prepare_for_sort(i*100);
         printf("%ld\n",i*100);
 		DWORD t1 = GetTickCount();
@@ -79,15 +78,13 @@ void start_sort_experiment(DWORD *input_delta, void (*fun_ptr)(int* l, int* r), 
 
 int main(void)
 {
-	string section_bubble="bubblesort";
-	string section_comb="combsort";
-	string section_insert="insertionsort";
-	string section_tree="treesort";
-	string section_gnome="gnomesort";
-	string section_shaker="shakersort";
-	string section_selection="selectionsort";
-
-    random_generator(MAX_GENERATED_VALUES);
-    start_sort_experiment(bubblesort_delta,bubblesort,section_bubble);
+    random_generator(MAX_GENERATED_NUM_OF_VALUES);
+    start_sort_experiment(bubblesort_delta,bubblesort,"bubblesort");
+    start_sort_experiment(combsort_delta,combsort,"combsort");
+    start_sort_experiment(insertionsort_delta,insertionsort,"insertionsort");
+    start_sort_experiment(treesort_delta,treesort,"treesort");
+    start_sort_experiment(gnomesort_delta,gnomesort,"gnomesort");
+    start_sort_experiment(shakersort_delta,shakersort,"shakersort");
+    start_sort_experiment(selectionsort_delta,selectionsort,"selectionsort");
     return 0;
 }
