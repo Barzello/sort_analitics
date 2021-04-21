@@ -5,6 +5,7 @@
 #include <fstream>
 #include <string>
 #include <ctime>
+#include <io.h>
 #include "sysinfoapi.h"
 #include "sort_list.hpp"
 using namespace std;
@@ -53,13 +54,21 @@ void prepare_for_sort(uint32_t NUM) //copy random massive to sort it
 
 void writeFile(DWORD *delta, string section) //function used to create txt file
 {
-    FILE *fp;
+    fpos_t pos;
+    fgetpos(stdout, &pos);
+    int fd = dup(fileno(stdout));
+
     const string s = section + ".txt";
-	cout << s.c_str() << endl;
-    fp=freopen(s.c_str(), "w", stdout);
+    freopen(s.c_str(), "w", stdout);
 	for (int i = 0; i < MAX_OUTPUT_DATA; i++)
     	printf("%d\n", delta[i]);
-    fclose(fp);
+    
+    fflush(stdout);
+    dup2(fd, fileno(stdout));
+    //fclose(stdout);
+    close(fd);
+    clearerr(stdout);
+    fsetpos(stdout, &pos);
 }
 
 void start_sort_experiment(DWORD *input_delta, void (*fun_ptr)(int* l, int* r), string filename)
@@ -79,15 +88,8 @@ void start_sort_experiment(DWORD *input_delta, void (*fun_ptr)(int* l, int* r), 
 
 int main(void)
 {
-	string section_bubble="bubblesort";
-	string section_comb="combsort";
-	string section_insert="insertionsort";
-	string section_tree="treesort";
-	string section_gnome="gnomesort";
-	string section_shaker="shakersort";
-	string section_selection="selectionsort";
     random_generator(MAX_GENERATED_NUM_OF_VALUES);
-    start_sort_experiment(bubblesort_delta,bubblesort,section_bubble);
+    start_sort_experiment(bubblesort_delta,bubblesort,"bubblesort");
     start_sort_experiment(combsort_delta,combsort,"combsort");
     start_sort_experiment(insertionsort_delta,insertionsort,"insertionsort");
     start_sort_experiment(treesort_delta,treesort,"treesort");
